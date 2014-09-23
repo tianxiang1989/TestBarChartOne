@@ -54,6 +54,10 @@ public class BarChartView extends View {
 	private final int PADDING_RIGHT = changeDp(40);
 	/**柱状图文字的边距*/
 	private final int TEXT_PADDING = changeDp(4);
+	/**柱状图的高度*/
+	private final int BARCHART_HEIGHT=changeDp(18);
+	/**每个柱状图加上下面的空白的高度*/
+	private final int BARCHART_UP_DOWN_HEIGHT = changeDp(35);
 	// ===============view状态变量===============
 	/**柱状图背景的x右坐标*/
 	private float barChartViewBgnRight;
@@ -109,6 +113,7 @@ public class BarChartView extends View {
 	private boolean runDraw = false;
 	/**标识传来的x数据中最大值和最小值的正负*/
 	POSITIVE_FLAG positive_Flag;
+	
 
 	// ---------------各种方法BEGIN---------------
 	// ---------------复写父类的方法---------------
@@ -130,8 +135,7 @@ public class BarChartView extends View {
 		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		Display display = manager.getDefaultDisplay();
 		viewWidth = display.getWidth();// 定义宽
-		// paddingRight = changeDp(40);
-		viewHeight = (int) CHART_TITLE_ROW_HEIHGT + PADDING_RIGHT + changeDp(35) * sizeY
+		viewHeight = (int) CHART_TITLE_ROW_HEIHGT + PADDING_RIGHT + BARCHART_UP_DOWN_HEIGHT * sizeY
 				+ changeDp(10);// 定义高
 		barChartViewBgnRight = this.viewWidth - VIEW_MARGIN - PADDING_RIGHT;
 		setMeasuredDimension(viewWidth, viewHeight);
@@ -225,7 +229,7 @@ public class BarChartView extends View {
 		float startY = CHART_TITLE_ROW_HEIHGT + changeDp(40);
 		for (int i = 0; i < yValueList.size(); i++) {
 			yAxisList.add(startY);
-			startY = startY + changeDp(35);
+			startY = startY + BARCHART_UP_DOWN_HEIGHT;
 		}
 	}
 
@@ -500,7 +504,7 @@ public class BarChartView extends View {
 				// 背景
 				RectF bar = null;
 				bar = new RectF(barChartViewBgnLeft, yAxisList.get(i), xAxisList.get(i),
-						yAxisList.get(i) + changeDp(18));
+						yAxisList.get(i) + BARCHART_HEIGHT);
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
@@ -518,7 +522,7 @@ public class BarChartView extends View {
 				// 背景
 				RectF bar = null;
 				bar = new RectF(xAxisList.get(i), yAxisList.get(i), barChartViewBgnRight,
-						yAxisList.get(i) + changeDp(18));
+						yAxisList.get(i) + BARCHART_HEIGHT);
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
@@ -536,7 +540,7 @@ public class BarChartView extends View {
 				// 背景
 				RectF bar = null;
 				bar = new RectF(zeroXAxis, yAxisList.get(i), xAxisList.get(i), yAxisList.get(i)
-						+ changeDp(18));
+						+ BARCHART_HEIGHT);
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
