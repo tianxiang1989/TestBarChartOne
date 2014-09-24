@@ -55,7 +55,7 @@ public class BarChartView extends View {
 	/**柱状图文字的边距*/
 	private final int TEXT_PADDING = changeDp(4);
 	/**柱状图的高度*/
-	private final int BARCHART_HEIGHT=changeDp(18);
+	private final int BARCHART_HEIGHT = changeDp(18);
 	/**每个柱状图加上下面的空白的高度*/
 	private final int BARCHART_UP_DOWN_HEIGHT = changeDp(35);
 	// ===============view状态变量===============
@@ -90,6 +90,8 @@ public class BarChartView extends View {
 	private Paint zeroXPaint;
 	/**画x=0数值的画笔*/
 	private TextPaint zeroXTextPaint;
+	/**柱状图文字的画笔*/
+	private TextPaint textBarchartPaint;
 	// ===============view数据===============
 	/** chart标题名称 */
 	private String chartTitleName;
@@ -113,7 +115,6 @@ public class BarChartView extends View {
 	private boolean runDraw = false;
 	/**标识传来的x数据中最大值和最小值的正负*/
 	POSITIVE_FLAG positive_Flag;
-	
 
 	// ---------------各种方法BEGIN---------------
 	// ---------------复写父类的方法---------------
@@ -175,14 +176,14 @@ public class BarChartView extends View {
 		// 画x,y值数值的画笔
 		textXYPaint = new TextPaint();
 		textXYPaint.setTextSize(changeDp(12));
-		textXYPaint.setColor(0xffc6c6c6);
+		textXYPaint.setColor(0xffc3c3c3);
 
 		// 画标题的画笔
 		titlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		titlePaint.setAntiAlias(true);
-		titlePaint.setColor(Color.BLACK);
-		titlePaint.setAlpha(90);
-		titlePaint.setTextSize(changeDp(15));
+		titlePaint.setColor(0xff7d7d7d);
+		// titlePaint.setAlpha(90);//透明度
+		titlePaint.setTextSize(changeDp(16));
 
 		// 背景参考柱状图的画笔
 		relativeBarchartPaint = new Paint();
@@ -194,7 +195,7 @@ public class BarChartView extends View {
 		relativeXLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		relativeXLinePaint.setAntiAlias(true);
 		relativeXLinePaint.setColor(Color.BLACK);
-		relativeXLinePaint.setAlpha(90);
+		relativeXLinePaint.setAlpha(80);
 
 		// 柱状图画笔
 		barchartPaint = new Paint();
@@ -202,17 +203,22 @@ public class BarChartView extends View {
 		barchartPaint.setAntiAlias(true);
 		barchartPaint.setStyle(Paint.Style.FILL);
 
-		// 画x=0的画笔
+		// 画x=0竖线的画笔
 		zeroXPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		zeroXPaint.setAntiAlias(true);
-		zeroXPaint.setColor(Color.RED);
-		zeroXPaint.setAlpha(90);
-		zeroXPaint.setStrokeWidth(changeDp(2));
+		zeroXPaint.setColor(Color.BLACK);
+		zeroXPaint.setAlpha(95);
+		// zeroXPaint.setStrokeWidth(changeDp(2));
 
 		// 画x=0数值的画笔
 		zeroXTextPaint = new TextPaint();
 		zeroXTextPaint.setTextSize(changeDp(14));
 		zeroXTextPaint.setColor(Color.RED);
+
+		// 柱状图文字的画笔
+		textBarchartPaint = new TextPaint();
+		textBarchartPaint.setTextSize(changeDp(12));
+		textBarchartPaint.setColor(0xff1ea8ff);
 	}
 
 	/**初始化数据*/
@@ -466,8 +472,9 @@ public class BarChartView extends View {
 		xAxisLineList.add(barChartViewBgnRight);// 画最右边的线 (因为float的除法会有误差)
 
 		for (int i = 0; i < xAxisLineList.size(); i++) {
-			canvas.drawLine(xAxisLineList.get(i), CHART_TITLE_ROW_HEIHGT + changeDp(32),
-					xAxisLineList.get(i), viewHeight - 2 * VIEW_MARGIN, relativeXLinePaint);
+			canvas.drawLine(xAxisLineList.get(i), CHART_TITLE_ROW_HEIHGT + changeDp(28),
+					xAxisLineList.get(i), CHART_TITLE_ROW_HEIHGT + changeDp(28) + changeDp(8),
+					relativeXLinePaint);
 		}
 	}
 
@@ -508,9 +515,9 @@ public class BarChartView extends View {
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
-				StaticLayout layout = new StaticLayout(str, textXYPaint,
-						(int) textXYPaint.measureText(str), Alignment.ALIGN_NORMAL, 1.0F, 0.0F,
-						true);
+				StaticLayout layout = new StaticLayout(str, textBarchartPaint,
+						(int) textBarchartPaint.measureText(str), Alignment.ALIGN_NORMAL, 1.0F,
+						0.0F, true);
 				int cur = canvas.save(); // 保存当前状态
 				canvas.translate(xAxisList.get(i) + TEXT_PADDING / 2f, yAxisList.get(i));// 画笔的位置
 				layout.draw(canvas);
@@ -526,8 +533,8 @@ public class BarChartView extends View {
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
-				float textWidth = textXYPaint.measureText(str);
-				StaticLayout layout = new StaticLayout(str, textXYPaint, (int) textWidth,
+				float textWidth = textBarchartPaint.measureText(str);
+				StaticLayout layout = new StaticLayout(str, textBarchartPaint, (int) textWidth,
 						Alignment.ALIGN_OPPOSITE, 1.0F, 0.0F, true);
 				int cur = canvas.save(); // 保存当前状态
 				canvas.translate(xAxisList.get(i) - textWidth - TEXT_PADDING / 2f, yAxisList.get(i));// 画笔的位置
@@ -544,9 +551,9 @@ public class BarChartView extends View {
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
-				float textWidth = textXYPaint.measureText(str);
+				float textWidth = textBarchartPaint.measureText(str);
 				if (str.indexOf("-") > -1) {
-					StaticLayout layout = new StaticLayout(str, textXYPaint, (int) textWidth,
+					StaticLayout layout = new StaticLayout(str, textBarchartPaint, (int) textWidth,
 							Alignment.ALIGN_OPPOSITE, 1.0F, 0.0F, true);
 					int cur = canvas.save(); // 保存当前状态
 					canvas.translate(xAxisList.get(i) - textWidth - TEXT_PADDING / 2f,
@@ -554,7 +561,7 @@ public class BarChartView extends View {
 					layout.draw(canvas);
 					canvas.restoreToCount(cur);
 				} else {
-					StaticLayout layout = new StaticLayout(str, textXYPaint, (int) textWidth,
+					StaticLayout layout = new StaticLayout(str, textBarchartPaint, (int) textWidth,
 							Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
 					int cur = canvas.save(); // 保存当前状态
 					canvas.translate(xAxisList.get(i) + TEXT_PADDING / 2f, yAxisList.get(i));// 画笔的位置
