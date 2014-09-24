@@ -151,10 +151,9 @@ public class BarChartView extends View {
 			drawTitleText(canvas); // 画标题
 			drawYBackgroud(canvas); // 画柱状图的参考背景
 			drawYText(canvas);// 画y轴显示的值
-			drawXRelativeLine(canvas);// 画x轴参考竖线
-			drawXRelativeLineText(canvas);// 画x轴参考竖线上方显示的值
+			drawXRelativeLineAndText(canvas);// 画x轴参考竖线以及上方显示的值
 			if (zeroXAxis != 0) {// 判断是否需要画x=0参考线和值
-				drawXZeroLine(canvas);
+				drawXZeroLineAndText(canvas);
 			}
 			drawXBarChart(canvas);// 画x轴的柱状图
 		}
@@ -461,7 +460,8 @@ public class BarChartView extends View {
 	 * 画x轴参考竖线 
 	 * @param canvas
 	 */
-	private void drawXRelativeLine(Canvas canvas) {
+	private void drawXRelativeLineAndText(Canvas canvas) {
+		//画x轴参考竖线 
 		float degree = (barChartViewBgnRight - barChartViewBgnLeft) / X_HOW_MANY;
 		float beginX = barChartViewBgnLeft;
 
@@ -476,10 +476,7 @@ public class BarChartView extends View {
 					xAxisLineList.get(i), CHART_TITLE_ROW_HEIHGT + changeDp(28) + changeDp(8),
 					relativeXLinePaint);
 		}
-	}
-
-	/**画x轴参考竖线显示的值*/
-	private void drawXRelativeLineText(Canvas canvas) {
+		//画x轴参考竖线上方显示的值
 		for (int i = 0; i < xAxisLineValueList.size(); i++) {
 			float xAxis = xAxisLineList.get(i);
 			String str = xAxisLineValueList.get(i) + "";
@@ -577,7 +574,7 @@ public class BarChartView extends View {
 	 * 画x=0的线 最大值为正数，最小值为负数时
 	 * @param canvas
 	 */
-	private void drawXZeroLine(Canvas canvas) {
+	private void drawXZeroLineAndText(Canvas canvas) {
 		canvas.drawLine(zeroXAxis, CHART_TITLE_ROW_HEIHGT + changeDp(26), zeroXAxis, viewHeight - 2
 				* VIEW_MARGIN, zeroXPaint);// 画x=0的竖线
 
