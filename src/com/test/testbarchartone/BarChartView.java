@@ -284,7 +284,7 @@ public class BarChartView extends View {
 				xAxisList.add(xAlis);
 			}
 
-			// 计算x等分点参考线的坐标
+			// 计算x等分点参考线显示的值
 			xAxisLineValueList.clear();
 			for (int i = 0; i <= X_HOW_MANY; i++) {
 				xAxisLineValueList.add(formatNum(xDrawMinValue));
@@ -307,7 +307,7 @@ public class BarChartView extends View {
 				xAlis = barChartViewBgnRight - (xDrawMaxValue - xValue) / degree;
 				xAxisList.add(xAlis);
 			}
-			// 计算x等分点参考线的坐标
+			// 计算x等分点参考线显示的值
 			xAxisLineValueList.clear();
 			for (int i = 0; i <= X_HOW_MANY; i++) {
 				xAxisLineValueList.add(formatNum(xDrawMaxValue));
@@ -332,7 +332,7 @@ public class BarChartView extends View {
 				xAxisList.add(xAlis);
 			}
 
-			// 计算x等分点参考线的坐标
+			// 计算x等分点参考线显示的值
 			xAxisLineValueList.clear();
 			for (int i = 0; i <= X_HOW_MANY; i++) {
 				xAxisLineValueList.add(formatNum(xDrawMinValue));
