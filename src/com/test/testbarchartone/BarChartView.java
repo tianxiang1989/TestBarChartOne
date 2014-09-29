@@ -13,7 +13,6 @@ import android.graphics.RectF;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
@@ -21,7 +20,7 @@ import android.view.WindowManager;
 
 /**
  * 柱状图view
- * liuxiuquan
+ * @author liuxiuquan
  * 2014-9-19
  */
 public class BarChartView extends View {
@@ -39,11 +38,11 @@ public class BarChartView extends View {
 	}
 
 	/**view的间隔 */
-	private final int VIEW_MARGIN = changeDp(5);
+	private final int VIEW_MARGIN = changeDp(0);
 	/**x坐标几等分*/
 	private final int X_HOW_MANY = 5;
 	/** chart标题栏的高度 */
-	private final float CHART_TITLE_ROW_HEIHGT = changeDp(60);
+	private final float CHART_TITLE_ROW_HEIHGT = changeDp(50);
 	/**getBaseLine中用到的标识 垂直居中*/
 	private final int TEXT_ALIGN_CENTER = 0;
 	/**getBaseLine中用到的标识 垂直靠下*/
@@ -57,7 +56,7 @@ public class BarChartView extends View {
 	/**柱状图的高度*/
 	private final int BARCHART_HEIGHT = changeDp(18);
 	/**每个柱状图加上下面的空白的高度*/
-	private final int BARCHART_UP_DOWN_HEIGHT = changeDp(35);
+	private final int BARCHART_UP_DOWN_HEIGHT = changeDp(30);
 	// ===============view状态变量===============
 	/**柱状图背景的x右坐标*/
 	private float barChartViewBgnRight;
@@ -211,7 +210,7 @@ public class BarChartView extends View {
 
 		// 画x=0数值的画笔
 		zeroXTextPaint = new TextPaint();
-		zeroXTextPaint.setTextSize(changeDp(14));
+		zeroXTextPaint.setTextSize(changeDp(16));
 		zeroXTextPaint.setColor(Color.RED);
 
 		// 柱状图文字的画笔
@@ -254,9 +253,9 @@ public class BarChartView extends View {
 		float barCharViewBgnWidth = barChartViewBgnRight - barChartViewBgnLeft;
 		/**精度比例*/
 		float degree;
-		/**画的x最大值的位置*/
+		/**画的x最大值*/
 		float xDrawMaxValue;
-		/**画的x最小值的位置*/
+		/**画的x最小值*/
 		float xDrawMinValue;
 		/**x坐标的间距*/
 		float perSpaceAxisValue = barCharViewBgnWidth / X_HOW_MANY;
@@ -269,10 +268,11 @@ public class BarChartView extends View {
 		switch (positive_Flag) {
 		case BOTH_POSITIVE:// 最大最小值均为正值
 			// 思路：从x的最小值计算各个点
-			if ((xMaxValue - xMinValue) / 2f > xMinValue) {
-				xDrawMinValue = xMinValue / 1.3f;
-			} else {
+			if ((xMaxValue - xMinValue) / 2f > xMinValue) {// 最大值远大于最小值
 				xDrawMinValue = 0;
+			} else {
+				xDrawMinValue = xMinValue - xMinValue * 0.01f;
+				// xDrawMinValue = xMinValue / 1.01f;
 			}
 			degree = (xMaxValue - xDrawMinValue) / (barCharViewBgnWidth - xMaxValueWidth);
 
@@ -294,9 +294,10 @@ public class BarChartView extends View {
 		case BOTH_NEGATIVE:// 最大值最小值均为负值
 			// 思路:从x的最大值计算各个点
 			if ((xMinValue - xMaxValue) / 2f < xMaxValue) {
-				xDrawMaxValue = xMaxValue / 1.3f;
-			} else {
 				xDrawMaxValue = 0;
+			} else {
+				xDrawMaxValue = xMaxValue - xMaxValue * 0.01f;
+//				 xDrawMaxValue = xMaxValue / 1.05f;
 			}
 			degree = (xDrawMaxValue - xMinValue) / (barCharViewBgnWidth - xMinValueWidth);
 
@@ -414,9 +415,9 @@ public class BarChartView extends View {
 	/**画标题*/
 	private void drawTitleText(Canvas canvas) {
 		// 画标题下的一条横线
-		float lineStartX = VIEW_MARGIN;
+		float lineStartX = changeDp(10);
 		float lineStartY = CHART_TITLE_ROW_HEIHGT;
-		float lineStopX = this.viewWidth - VIEW_MARGIN;
+		float lineStopX = this.viewWidth - changeDp(20);
 		float lineStopY = lineStartY;
 		canvas.drawLine(lineStartX, lineStartY, lineStopX, lineStopY, titlePaint);
 
@@ -461,7 +462,7 @@ public class BarChartView extends View {
 	 * @param canvas
 	 */
 	private void drawXRelativeLineAndText(Canvas canvas) {
-		//画x轴参考竖线 
+		// 画x轴参考竖线
 		float degree = (barChartViewBgnRight - barChartViewBgnLeft) / X_HOW_MANY;
 		float beginX = barChartViewBgnLeft;
 
@@ -476,7 +477,7 @@ public class BarChartView extends View {
 					xAxisLineList.get(i), CHART_TITLE_ROW_HEIHGT + changeDp(28) + changeDp(8),
 					relativeXLinePaint);
 		}
-		//画x轴参考竖线上方显示的值
+		// 画x轴参考竖线上方显示的值
 		for (int i = 0; i < xAxisLineValueList.size(); i++) {
 			float xAxis = xAxisLineList.get(i);
 			String str = xAxisLineValueList.get(i) + "";
@@ -543,8 +544,15 @@ public class BarChartView extends View {
 			for (int i = 0; i < xValueList.size(); i++) {
 				// 背景
 				RectF bar = null;
-				bar = new RectF(zeroXAxis, yAxisList.get(i), xAxisList.get(i), yAxisList.get(i)
-						+ BARCHART_HEIGHT);
+				if (zeroXAxis < xAxisList.get(i)) {
+					bar = new RectF(zeroXAxis, yAxisList.get(i), xAxisList.get(i), yAxisList.get(i)
+							+ BARCHART_HEIGHT);
+				} else {
+					bar = new RectF(xAxisList.get(i), yAxisList.get(i), zeroXAxis,
+							yAxisList.get(i) + BARCHART_HEIGHT);
+				}
+				// bar = new RectF(zeroXAxis, yAxisList.get(i), xAxisList.get(i), yAxisList.get(i)
+				// + BARCHART_HEIGHT);
 				canvas.drawRect(bar, barchartPaint);
 				// 文字
 				String str = xValueList.get(i) + "";
@@ -575,15 +583,15 @@ public class BarChartView extends View {
 	 * @param canvas
 	 */
 	private void drawXZeroLineAndText(Canvas canvas) {
-		canvas.drawLine(zeroXAxis, CHART_TITLE_ROW_HEIHGT + changeDp(26), zeroXAxis, viewHeight - 2
-				* VIEW_MARGIN, zeroXPaint);// 画x=0的竖线
+		canvas.drawLine(zeroXAxis, CHART_TITLE_ROW_HEIHGT + changeDp(28), zeroXAxis, viewHeight -
+				changeDp(13), zeroXPaint);// 画x=0的竖线
 
-		int fontTotalWidth = changeDp(42);
+		int fontTotalWidth = (int) zeroXTextPaint.measureText("0");
 		StaticLayout layout = new StaticLayout("0", zeroXTextPaint, fontTotalWidth,
 				Alignment.ALIGN_CENTER, 1.0F, 0.0F, true);
 		int cur = canvas.save(); // 保存当前状态
-		canvas.translate(zeroXAxis - fontTotalWidth / 2f, VIEW_MARGIN + CHART_TITLE_ROW_HEIHGT
-				+ changeDp(0));// 画笔的位置
+		canvas.translate(zeroXAxis + changeDp(2) , VIEW_MARGIN + CHART_TITLE_ROW_HEIHGT
+				+ changeDp(18));// 画笔的位置
 		layout.draw(canvas);
 		canvas.restoreToCount(cur);
 	}
@@ -609,7 +617,9 @@ public class BarChartView extends View {
 			positiveOrNegativeFlag = -1;
 			ff = -ff;
 		}
-		if (ff < 1) {
+		if (ff == 0) {
+			res = "0";
+		} else if (ff < 1) {
 			df = new DecimalFormat("###.000");
 			res = "0" + df.format(ff) + "";
 		} else if (ff > 100) {
