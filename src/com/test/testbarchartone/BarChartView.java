@@ -157,7 +157,6 @@ public class BarChartView extends View {
 			drawXBarChart(canvas);// 画x轴的柱状图
 		}
 	}
-
 	// ---------------初始化数据的方法---------------
 	/** 初始化画笔 */
 	public void initPaint() {

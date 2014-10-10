@@ -11,6 +11,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 /**
@@ -36,6 +39,74 @@ public class MainActivity extends Activity {
 		rl_barchart_out = (RelativeLayout) findViewById(R.id.ll_barchart_out);
 		DrawThread th = new DrawThread();
 		th.start();
+
+		// 改变数据源
+		Button btn_change_view = (Button) findViewById(R.id.btn_change_view);
+		btn_change_view.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// 1 测试数据 最大最小均为正值
+				/*String strJson = "{\"measurename\":\"日收入\",\"value\":\"3946\",\"ringrate\":\"--\",\"unit\":\"万元\",\"column\":"
+						+ "{\"y\":[\"689\",\"568\",\"465\",\"457\",\"368\",\"299\",\"296\",\"231\",\"157\",\"87\",\"33\""
+						+ "],\"x\":[\"保定\",\"石家庄\",\"唐山\",\"邯郸五六七八九\",\"沧州\",\"邢台\",\"廊坊\",\"张家口\",\"承德\",\"秦皇岛\",\"衡水\"]},"
+						+ "\"regionname\":\"河北省\",\"cycle\":\"日\",\"date\":\"2014年6月19日 \",\"measuerid\":\"DAY_INCOME\""
+						+ ",\"state\":\"语音、短信、彩信、梦网、GPRS话单日收入\",\"samerate\":\"-13.50%\",\"source\":\"市场运营简报\""
+						+ ",\"zhexian\":{\"y\":[\"4040\",\"3721\",\"3457\",\"4238\",\"3912\",\"3946\"],\"x\":[\"6月14日 \""
+						+ ",\"6月15日 \",\"6月16日 \",\"6月17日 \",\"6月18日 \",\"6月19日 \"]}}";*/
+
+				/*// 2 测试数据 最大为正值 最小为负值
+				String strJson = "{\"measurename\":\"日收入\",\"value\":\"3946\",\"ringrate\":\"--\",\"unit\":\"万元\",\"column\":"
+						+ "{\"y\":[\"689\",\"568\",\"465\",\"457\",\"368\",\"299\",\"125\",\"-81\",\"-157\",\"-287\",\"-610\""
+						+ "],\"x\":[\"保定五六七八九\",\"石家庄一二三四五\",\"唐山\",\"邯郸\",\"沧州\",\"邢台\",\"廊坊\",\"张家口\",\"承德\",\"秦皇岛\",\"衡水\"]},"
+						+ "\"regionname\":\"河北省\",\"cycle\":\"日\",\"date\":\"2014年6月19日 \",\"measuerid\":\"DAY_INCOME\""
+						+ ",\"state\":\"语音、短信、彩信、梦网、GPRS话单日收入\",\"samerate\":\"-13.50%\",\"source\":\"市场运营简报\""
+						+ ",\"zhexian\":{\"y\":[\"4040\",\"3721\",\"3457\",\"4238\",\"3912\",\"3946\"],\"x\":[\"6月14日 \""
+						+ ",\"6月15日 \",\"6月16日 \",\"6月17日 \",\"6月18日 \",\"6月19日 \"]}}";*/
+
+				// 3 测试数据 最大值和 最小均为负值
+				String strJson = "{\"measurename\":\"日收入\",\"value\":\"3946\",\"ringrate\":\"--\",\"unit\":\"万元\",\"column\":"
+						+ "{\"y\":[\"-4\",\"-81\",\"-165\",\"-257\",\"-290\",\"-327\",\"-368\",\"-454\",\"-512\",\"-666\",\"-773\""
+						+ "],\"x\":[\"保定五六七八九\",\"石家庄一二三四五\",\"唐山\",\"邯郸\",\"沧州\",\"邢台\",\"廊坊\",\"张家口\",\"承德\",\"秦皇岛\",\"衡水\"]},"
+						+ "\"regionname\":\"河北省\",\"cycle\":\"日\",\"date\":\"2014年6月19日 \",\"measuerid\":\"DAY_INCOME\""
+						+ ",\"state\":\"语音、短信、彩信、梦网、GPRS话单日收入\",\"samerate\":\"-13.50%\",\"source\":\"市场运营简报\""
+						+ ",\"zhexian\":{\"y\":[\"4040\",\"3721\",\"3457\",\"4238\",\"3912\",\"3946\"],\"x\":[\"6月14日 \""
+						+ ",\"6月15日 \",\"6月16日 \",\"6月17日 \",\"6月18日 \",\"6月19日 \"]}}";
+
+				String column = getOnedata(strJson, "column");// 柱状图数据
+				// String column = getOnedata(strJson, "zhexian");//折线图数据
+
+				JSONObject columnValues;
+				try {
+					columnValues = new JSONObject(column);
+					JSONArray columnXArray = columnValues.getJSONArray("x");
+					JSONArray columnYArray = columnValues.getJSONArray("y");
+					List<String> columnXList = new ArrayList<String>();// x轴数据
+					List<Float> columnYList = new ArrayList<Float>();// y轴数据
+					for (int i = 0; i < columnXArray.length(); i++) {
+						columnYList.add(Float.parseFloat(columnYArray.getString(i)));
+						columnXList.add(columnXArray.getString(i));
+					}
+					// cv.setData(columnXList, columnYList);// 组件数据赋值
+
+					// 改变元素
+					rl_barchart_out.removeView(v1);
+
+					int sizeY = columnYList.size();
+					v1 = new BarChartView(context, sizeY);
+					v1.setChartTitleName("新标题");// 设置表报标题
+					v1.setxValueList(columnYList);
+					v1.setyValueList(columnXList);
+					v1.startRunDraw();
+					Log.v(TAG, "v1.startRunDraw()");
+
+					rl_barchart_out.addView(v1);// 将自定义view加到relativeLayout中
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	// 模拟请求网络的延时thread
@@ -56,8 +127,6 @@ public class MainActivity extends Activity {
 		Runnable updateThread = new Runnable() {
 			@Override
 			public void run() {
-				// Toast.makeText(context, "viewWidth==", Toast.LENGTH_SHORT).show();
-
 				// 数据源分析：
 				// {"measurename":"日收入", //上方的标题
 				// "value":"3946", //上方标题的值
@@ -145,24 +214,24 @@ public class MainActivity extends Activity {
 				}
 			}
 		};
+	}
 
-		/**
-		 * 根据key获取json中的value
-		 * @param json
-		 * @param which
-		 * @return
-		 * @throws JSONException
-		 */
-		public String getOnedata(String json, String which) {
-			String result = "";
-			JSONObject jsonObject;
-			try {
-				jsonObject = new JSONObject(json);
-				result = jsonObject.getString(which).toString();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			return result;
+	/**
+	 * 根据key获取json中的value
+	 * @param json
+	 * @param which
+	 * @return
+	 * @throws JSONException
+	 */
+	public String getOnedata(String json, String which) {
+		String result = "";
+		JSONObject jsonObject;
+		try {
+			jsonObject = new JSONObject(json);
+			result = jsonObject.getString(which).toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
+		return result;
 	}
 }

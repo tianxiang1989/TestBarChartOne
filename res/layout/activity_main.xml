@@ -20,9 +20,17 @@
                 android:background="@android:color/darker_gray" >
 
                 <TextView
+                    android:id="@+id/tv_summary_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="这些东西是textview里的" />
+                
+                <Button
+                    android:id="@+id/btn_change_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_summary_text"
+                    android:text="点击切换view" />
             </RelativeLayout>
 
             <RelativeLayout
